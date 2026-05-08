@@ -1,0 +1,69 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# macOS Widget 风格 (Apple Human Interface Guidelines 审美)
+# 使用独立圆角气泡 (Pill)、Apple 原生标志  以及 macOS 官方系统色彩
+format = """
+$os$directory$git_branch$git_status$fill$nodejs$rust$golang$php$time
+$character"""
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+# 采用 macOS System Blue
+format = '[](#007AFF)[$symbol](bg:#007AFF fg:#FFFFFF)[](#007AFF) '
+
+[os.symbols]
+Macos = "  " # Apple 原生标志
+Linux = "  "
+Windows = "  "
+
+[directory]
+# 采用 macOS System Gray (深色模式窗口背景色)
+format = '[](#3A3A3C)[  $path ](bg:#3A3A3C fg:#FFFFFF)[](#3A3A3C) '
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+# 采用 macOS System Purple
+format = '[](#AF52DE)[  $branch ](bg:#AF52DE fg:#FFFFFF)[](#AF52DE) '
+
+[git_status]
+# 采用 macOS System Orange
+format = '([](#FF9500)[ $all_status$ahead_behind ](bg:#FF9500 fg:#FFFFFF)[](#FF9500) )'
+
+[nodejs]
+# 采用 macOS System Green
+format = '[](#34C759)[  $version ](bg:#34C759 fg:#FFFFFF)[](#34C759) '
+
+[rust]
+# 采用 macOS System Red
+format = '[](#FF3B30)[  $version ](bg:#FF3B30 fg:#FFFFFF)[](#FF3B30) '
+
+[golang]
+# 采用 macOS System Blue
+format = '[](#007AFF)[  $version ](bg:#007AFF fg:#FFFFFF)[](#007AFF) '
+
+[php]
+# 采用 macOS System Indigo
+format = '[](#5856D6)[  $version ](bg:#5856D6 fg:#FFFFFF)[](#5856D6) '
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+# 采用 macOS System Gray
+format = '[](#3A3A3C)[  $time ](bg:#3A3A3C fg:#FFFFFF)[](#3A3A3C)'
+
+[character]
+# 输入提示符：成功为 System Blue，失败为 System Red
+success_symbol = "[❯](bold #007AFF)"
+error_symbol = "[❯](bold #FF3B30)"

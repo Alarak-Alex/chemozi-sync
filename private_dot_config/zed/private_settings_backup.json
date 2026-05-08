@@ -1,0 +1,193 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry"
+    }
+  },
+  "inlay_hints": {
+    "show_background": false,
+    "enabled": true
+  },
+  "languages": {
+    "Go": {
+      "prettier": {
+        "allowed": false
+      }
+    }
+  },
+  "vim": {
+    "default_mode": "insert"
+  },
+  "minimap": {
+    "show": "always"
+  },
+  "cursor_shape": "bar",
+  "session": {
+    "trust_all_worktrees": false
+  },
+  "base_keymap": "VSCode",
+  "disable_ai": false,
+  "edit_predictions": {
+    "provider": "copilot"
+  },
+  "excerpt_context_lines": 4,
+  "context_servers": {
+    "Time": {
+      "enabled": true,
+      "command": "uvx",
+      "args": [
+        "mcp-server-time"
+      ],
+      "env": {}
+    }
+  },
+  "language_models": {
+    "openai_compatible": {
+      "MiNiMax": {
+        "api_url": "https://api.minimaxi.com/v1",
+        "available_models": [
+          {
+            "name": "MiniMax-M2.7",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true,
+              "chat_completions": true
+            }
+          }
+        ]
+      },
+      "火山方舟": {
+        "api_url": "https://ark.cn-beijing.volces.com/api/coding/v3",
+        "available_models": [
+          {
+            "name": "MiniMax-M2.5",
+            "max_tokens": 200000,
+            "max_output_tokens": 128000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true,
+              "chat_completions": true
+            }
+          }
+        ]
+      },
+      "Alibab-coding-plan": {
+        "api_url": "https://coding.dashscope.aliyuncs.com/v1",
+        "available_models": [
+          {
+            "name": "glm-4.7",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": true,
+              "parallel_tool_calls": true,
+              "prompt_cache_key": true,
+              "chat_completions": true
+            }
+          }
+        ]
+      },
+      "Alibab": {
+        "api_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "available_models": [
+          {
+            "name": "qwen3-coder-plus",
+            "max_tokens": 200000,
+            "max_output_tokens": 32000,
+            "max_completion_tokens": 200000,
+            "capabilities": {
+              "tools": true,
+              "images": false,
+              "parallel_tool_calls": false,
+              "prompt_cache_key": false
+            }
+          }
+        ]
+      }
+    }
+  },
+  "git_panel": {
+    "sort_by_path": true
+  },
+  "agent": {
+    "single_file_review": true,
+    "tool_permissions": {
+      "default": "allow"
+    },
+    "profiles": {
+      "minimal": {
+        "name": "Minimal",
+        "tools": {
+          "web_search": true,
+          "thinking": true,
+          "terminal": true,
+          "read_file": true,
+          "open": true,
+          "now": true,
+          "move_path": true,
+          "list_directory": true,
+          "grep": true,
+          "find_path": true,
+          "fetch": true,
+          "edit_file": true,
+          "diagnostics": true,
+          "delete_path": true,
+          "create_directory": true,
+          "copy_path": true
+        },
+        "enable_all_context_servers": false,
+        "context_servers": {
+          "sequential-thinking": {
+            "tools": {
+              "sequentialthinking": true
+            }
+          },
+          "Time": {
+            "tools": {
+              "get_current_time": true,
+              "convert_time": true
+            }
+          }
+        }
+      }
+    },
+    "default_profile": "minimal",
+    "default_model": {
+      "enable_thinking": false,
+      "provider": "MiNiMax",
+      "model": "MiniMax-M2.7"
+    }
+  },
+  "icon_theme": "Material Icon Theme",
+  "vim_mode": true,
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "dark",
+    "light": "macOS Classic Light",
+    "dark": "JetBrains Dark"
+  },
+  "terminal": {
+    "font_family": "Hack Nerd Font Mono"
+  },
+  "ui_font_family": "JetBrains Mono",
+  "buffer_font_family": "JetBrains Mono"
+}

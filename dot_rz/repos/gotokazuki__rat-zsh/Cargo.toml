@@ -1,0 +1,38 @@
+[package]
+name = "rz"
+version = "0.4.4"
+edition = "2024"
+
+[profile.release]
+strip = "symbols"
+
+[profile.compact]
+inherits = "release"
+opt-level = "s"
+lto = true
+panic = "abort"
+codegen-units = 1
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.9"
+anyhow = "1.0"
+git2 = { version = "0.20", features = ["vendored-openssl"] }
+regex = "1"
+rayon = "1"
+num_cpus = "1"
+indicatif = "0.18"
+reqwest = { version = "0.12", features = ["blocking", "json", "rustls-tls"] }
+tempfile = "3"
+sha2 = "0.10"
+hex = "0.4"
+flate2 = "1"
+tar = "0.4"
+zip = { version = "0.6", default-features = false, features = ["deflate"] }
+colored = "3"
+
+[dev-dependencies]
+serial_test = "3"
+httpmock = "0.7"
+serde_json = "1"

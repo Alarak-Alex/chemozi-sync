@@ -1,0 +1,131 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# 完整边框格式，深度还原 p10k 的 ╭─ ─╮ ╰─ 以及中间的连接线 (sparse + full frame)
+# 左侧：系统 -> 目录 -> Git
+# 中间：由 $fill 连线填充
+# 右侧：后台任务 -> 状态 -> 耗时 -> 语言 -> 时间 -> 边框闭合
+format = """
+[╭─](bold #8CAAEE)[](#a3aed2)\
+$os\
+[](bg:#769ff0 fg:#a3aed2)\
+$directory\
+[](bg:#394260 fg:#769ff0)\
+$git_branch\
+$git_status\
+[](fg:#394260)\
+$fill\
+$jobs\
+$status\
+$cmd_duration\
+$nodejs\
+$rust\
+$golang\
+$php\
+$python\
+[](#1d2230)\
+$time\
+[](#1d2230)[─╮](bold #8CAAEE)
+[╰─](bold #8CAAEE)$character"""
+
+# 禁用 right_format，因为使用了 fill 模块实现完美的左右对齐连线
+right_format = ""
+
+[fill]
+symbol = "─"
+style = "bold #8CAAEE"
+
+[os]
+disabled = false
+style = "bg:#a3aed2 fg:#090c0c"
+format = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos = ""
+Linux = ""
+Windows = ""
+
+[directory]
+style = "bg:#769ff0 fg:#e3e5e5"
+format = '[  $path ]($style)'
+truncation_length = 10
+truncate_to_repo = false
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "bg:#394260 fg:#a0a9cb"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#394260 fg:#a0a9cb"
+format = '[$all_status$ahead_behind ]($style)'
+
+[jobs]
+symbol = "✦"
+style = "bold blue"
+format = '[$symbol$number ]($style)'
+
+[status]
+disabled = false
+format = '[ $symbol $status ]($style)'
+style = "bold red"
+symbol = "✘"
+
+[cmd_duration]
+min_time = 500
+format = '[ $duration ](bold yellow)'
+
+# 语言模块采用精美图标和配色，每个语言都有独特的视觉风格
+[nodejs]
+symbol = "󰎙"
+style = "bg:#1e1e1e fg:#4caf50 bold"
+format = '[ $symbol Node.js ($version) ]($style)'
+
+[rust]
+symbol = "󱘗"
+style = "bg:#1e1e1e fg:#f44336 bold"
+format = '[ $symbol Rust ($version) ]($style)'
+
+[golang]
+symbol = "󰟓"
+style = "bg:#1e1e1e fg:#00add8 bold"
+format = '[ $symbol Go ($version) ]($style)'
+
+[php]
+symbol = "󰌣"
+style = "bg:#1e1e1e fg:#777bb4 bold"
+format = '[ $symbol PHP ($version) ]($style)'
+
+[python]
+symbol = "󰌠"
+style = "bg:#1e1e1e fg:#ffbc03 bold"
+format = '[ $symbol Python ($version) ]($style)'
+
+# 额外语言支持
+[bun]
+symbol = "🥟"
+style = "bg:#1e1e1e fg:#fbf0df bold"
+format = '[ $symbol Bun ($version) ]($style)'
+
+[deno]
+symbol = "󰱯"
+style = "bg:#1e1e1e fg:#ffffff bold"
+format = '[ $symbol Deno ($version) ]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "bg:#1d2230 fg:#a0a9cb"
+format = '[  $time ]($style)'
+
+[character]
+success_symbol = "[❯](bold #769ff0)"
+error_symbol = "[❯](bold red)"

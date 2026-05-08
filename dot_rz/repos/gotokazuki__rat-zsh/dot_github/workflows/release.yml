@@ -1,0 +1,230 @@
+name: Release
+
+concurrency:
+  group: release-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gate:
+    name: Gate & tag
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'release/'))
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.decide.outputs.should_release }}
+      version:        ${{ steps.ver.outputs.version }}
+      tag:            ${{ steps.ver.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Extract version from Cargo.toml
+        id: ver
+        run: |
+          set -euo pipefail
+          ver=$(cargo metadata --no-deps --format-version 1 \
+            | jq -r '.packages[] | select(.source == null) | .version')
+          [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z\.-]+)?$ ]] || {
+            echo "Invalid semver: $ver" >&2; exit 1; }
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          echo "tag=v$ver"    >> "$GITHUB_OUTPUT"
+          echo "Detected version: $ver"
+
+      - name: Decide & create tag (if needed)
+        id: decide
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="v${{ steps.ver.outputs.version }}"
+          echo "Tag to create: $tag"
+
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "Tag $tag already exists. Skip release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          latest="$(git tag -l 'v*' | sort -V | tail -n1 || true)"
+          if [ -n "$latest" ]; then
+            top="$(printf "%s\n%s\n" "$latest" "$tag" | sort -V | tail -n1)"
+            if [ "$top" != "$tag" ]; then
+              echo "Version decreased: $tag < $latest" >&2
+              exit 1
+            fi
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -a "$tag" -m "Release $tag" "${GITHUB_SHA}"
+          git push origin "$tag"
+
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+          echo "Created tag $tag"
+
+  build:
+    name: Build (${{ matrix.target }} on ${{ matrix.runner }})
+    needs: gate
+    if: needs.gate.outputs.should_release == 'true'
+    runs-on: ${{ matrix.runner }}
+    env:
+      PROFILE: compact
+      TAG: ${{ needs.gate.outputs.tag }}
+      VERSION: ${{ needs.gate.outputs.version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            os: linux
+            arch: x86_64
+            use-cross: false
+          - runner: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            os: linux
+            arch: aarch64
+            use-cross: true
+          - runner: macos-latest
+            target: aarch64-apple-darwin
+            os: macos
+            arch: aarch64
+            use-cross: false
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.runner }}-${{ matrix.target }}-${{ matrix.use-cross }}
+
+      - name: Add target (non-cross)
+        if: ${{ !matrix.use-cross }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          rustup target add ${{ matrix.target }}
+          if [[ "${{ matrix.target }}" == *-unknown-linux-musl ]]; then
+            sudo apt-get update
+            sudo apt-get install -y musl-tools
+          fi
+
+      - name: Install cross (for cross-compiling)
+        if: ${{ matrix.use-cross }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo install cross --git https://github.com/cross-rs/cross
+          rustup target add ${{ matrix.target }} || true
+
+      - name: Build (cross)
+        if: ${{ matrix.use-cross }}
+        run: cross build --profile "$PROFILE" --target ${{ matrix.target }}
+
+      - name: Build (cargo)
+        if: ${{ !matrix.use-cross }}
+        run: cargo build --profile "$PROFILE" --target ${{ matrix.target }}
+
+      - name: Package (tar.gz)
+        shell: bash
+        run: |
+          set -euo pipefail
+          BIN_DIR="target/${{ matrix.target }}/$PROFILE"
+          DIST="dist"
+          mkdir -p "$DIST"
+
+          EXE="rz"
+          BASENAME="rz-v${VERSION}-${{ matrix.os }}-${{ matrix.arch }}"
+          PKGDIR="${DIST}/${BASENAME}"
+          mkdir -p "$PKGDIR"
+
+          cp "${BIN_DIR}/${EXE}" "${PKGDIR}/"
+          chmod +x "${PKGDIR}/${EXE}" || true
+          [[ -f ./LICENSE ]] && cp LICENSE "${PKGDIR}/"
+
+          (cd "$DIST" && tar czf "${BASENAME}.tar.gz" "${BASENAME}")
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asset-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Create GitHub Release & upload assets
+    needs: [gate, build]
+    if: needs.gate.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.gate.outputs.tag }}
+      VERSION: ${{ needs.gate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd dist
+          : > SHA256SUMS.txt
+          for f in *.tar.gz; do
+            if command -v shasum >/dev/null 2>&1; then
+              shasum -a 256 "$f" >> SHA256SUMS.txt
+            else
+              sha256sum "$f" >> SHA256SUMS.txt
+            fi
+          done
+          cat SHA256SUMS.txt
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$TAG" \
+            --title "Release $TAG 🐭" \
+            --notes "Automated release for $TAG"
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$TAG" \
+            dist/*.tar.gz \
+            dist/SHA256SUMS.txt

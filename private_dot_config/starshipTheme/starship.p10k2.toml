@@ -1,0 +1,63 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# 定义整体布局：双行 Bracket 结构 + Pill 气泡风格
+# 使用 $fill 模块自动将后续内容推至终端最右侧
+format = """
+[╭─](bold #8CAAEE) $os$directory$git_branch$git_status$fill$nodejs$rust$golang$php$cmd_duration$time
+[╰─](bold #8CAAEE)$character"""
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+format = '[](#8CAAEE)[ $symbol ](bg:#8CAAEE fg:#292C3C)[ ](#8CAAEE)'
+
+[os.symbols]
+Macos = ""
+Linux = ""
+Windows = ""
+
+[directory]
+format = '[](#CA9EE6)[  $path ](bg:#CA9EE6 fg:#292C3C)[ ](#CA9EE6)'
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+format = '[](#A6D189)[  $branch ](bg:#A6D189 fg:#292C3C)[ ](#A6D189)'
+
+[git_status]
+format = '([](#E5C890)[ $all_status$ahead_behind ](bg:#E5C890 fg:#292C3C)[ ](#E5C890))'
+
+[nodejs]
+format = '[](#A6D189)[  $version ](bg:#A6D189 fg:#292C3C)[ ](#A6D189)'
+
+[rust]
+format = '[](#E78284)[  $version ](bg:#E78284 fg:#292C3C)[ ](#E78284)'
+
+[golang]
+format = '[](#8CAAEE)[  $version ](bg:#8CAAEE fg:#292C3C)[ ](#8CAAEE)'
+
+[php]
+format = '[](#CA9EE6)[  $version ](bg:#CA9EE6 fg:#292C3C)[ ](#CA9EE6)'
+
+[cmd_duration]
+min_time = 2_000
+format = '[](#E5C890)[  $duration ](bg:#E5C890 fg:#292C3C)[ ](#E5C890)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+format = '[](#8CAAEE)[  $time ](bg:#8CAAEE fg:#292C3C)[](#8CAAEE)'
+
+[character]
+success_symbol = "[❯](bold #A6D189)"
+error_symbol = "[❯](bold #E78284)"

@@ -1,0 +1,96 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# 左侧提示符：系统图标 -> 目录 -> Git状态
+format = """
+[╭─](bold #8CAAEE) [](#a3aed2)\
+$os\
+[](bg:#769ff0 fg:#a3aed2)\
+$directory\
+[](bg:#394260 fg:#769ff0)\
+$git_branch\
+$git_status\
+[](fg:#394260)\
+\n[╰─](bold #8CAAEE)$character"""
+
+# 右侧提示符：语言环境 -> 时间
+right_format = """
+$nodejs\
+$rust\
+$golang\
+$php\
+[](#1d2230)\
+$time\
+[](#1d2230)\
+"""
+
+[os]
+disabled = false
+style = "bg:#a3aed2 fg:#090c0c"
+format = '[ $symbol ]($style)'
+
+[os.symbols]
+Macos = "" # Apple 原生标志
+Linux = ""
+Windows = ""
+
+[directory]
+style = "bg:#769ff0 fg:#e3e5e5"
+format = '[  $path ]($style)'
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "bg:#394260 fg:#a0a9cb"
+format = '[ $symbol $branch ]($style)'
+
+[git_status]
+style = "bg:#394260 fg:#a0a9cb"
+format = '[$all_status$ahead_behind ]($style)'
+
+[nodejs]
+symbol = ""
+style = "fg:#81c784"
+format = '[$symbol ($version) ]($style)'
+
+[rust]
+symbol = ""
+style = "fg:#e57373"
+format = '[$symbol ($version) ]($style)'
+
+[golang]
+symbol = ""
+style = "fg:#64b5f6"
+format = '[$symbol ($version) ]($style)'
+
+[php]
+symbol = ""
+style = "fg:#9575cd"
+format = '[$symbol ($version) ]($style)'
+
+[python]
+symbol = "🐍"
+style = "fg:#ff75cd"
+format = '[$symbol ($version) ]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "bg:#1d2230 fg:#a0a9cb"
+format = '[  $time ]($style)'
+
+[character]
+success_symbol = "[❯](bold #769ff0)"
+error_symbol = "[❯](bold red)"
+
+[cmd_duration]
+min_time = 500
+format = 'underwent [$duration](bold yellow)'

@@ -1,0 +1,90 @@
+
+# Kiro CLI pre block. Keep at the top of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+
+[[ -o interactive ]] || return
+
+zmodload zsh/datetime 2>/dev/null
+typeset -gF _zshrc_start
+_zshrc_start=${EPOCHREALTIME:-0}
+
+export BUN_INSTALL="$HOME/.bun"
+
+# Android SDK
+export ANDROID_HOME="/Users/alarak/Library/Android/sdk"
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
+
+# Android NDK
+export NDK_HOME="$ANDROID_HOME/ndk/29.0.14206865"
+export PATH="$NDK_HOME:$PATH"
+
+typeset -U path PATH
+typeset _p
+for _p in \
+  "$HOME/.local/bin" \
+  "$HOME/.bun/bin" \
+  "$HOME/go/bin" \
+  "$HOME/jdk/bin" \
+  "$HOME/.jrs"\
+  "/opt/anaconda3/bin" 
+do
+  [[ -d "$_p" ]] && path=("$_p" $path)
+done
+unset _p
+
+if (( $+commands[nvim] )); then
+  alias vim='nvim'
+  export EDITOR=nvim
+else
+  export EDITOR=vim
+fi
+
+if (( $+commands[starship] )); then
+  eval "$(starship init zsh)"
+fi
+
+if [[ -x "${XDG_CONFIG_HOME:-$HOME}/.rz/bin/rz" ]]; then
+  eval "$("${XDG_CONFIG_HOME:-$HOME}"/.rz/bin/rz init)"
+fi
+
+if [[ -s "$HOME/.bun/_bun" ]]; then
+  . "$HOME/.bun/_bun"
+fi
+
+export NVM_DIR="$HOME/.nvm"
+_lazy_load_nvm() {
+  local cmd="$1"
+  shift
+  unset -f nvm node npm npx
+  [[ -s "$NVM_DIR/nvm.sh" ]] && \. "$NVM_DIR/nvm.sh"
+  [[ -s "$NVM_DIR/bash_completion" ]] && \. "$NVM_DIR/bash_completion"
+  "$cmd" "$@"
+}
+nvm() { _lazy_load_nvm nvm "$@"; }
+node() { _lazy_load_nvm node "$@"; }
+npm() { _lazy_load_nvm npm "$@"; }
+npx() { _lazy_load_nvm npx "$@"; }
+
+[[ -f "$HOME/.x-cmd.root/X" ]] && . "$HOME/.x-cmd.root/X"
+
+if [[ -n ${ZSHRC_TIMING-} && -n ${EPOCHREALTIME-} && ${_zshrc_start:-0} != 0 ]]; then
+  typeset -F 3 _zshrc_elapsed
+  _zshrc_elapsed=$(( EPOCHREALTIME - _zshrc_start ))
+  printf 'zshrc init: %.3fs\n' "$_zshrc_elapsed" >&2
+  unset _zshrc_elapsed
+fi
+unset _zshrc_start
+if [[ -r "$HOME/.vite-plus/env" ]]; then
+  . "$HOME/.vite-plus/env"
+fi
+
+# Claude Notifier 自动更新检查
+# [ -f /Users/alarak/.claude-notifier/check_update.sh ] && /Users/alarak/.claude-notifier/check_update.sh &
+
+# JAVA_HOME
+export JAVA_HOME="`jrs which`"
+# export JAVA_HOME="`jdkman which`"
+
+
+# Kiro CLI post block. Keep at the bottom of this file.
+[[ -f "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"

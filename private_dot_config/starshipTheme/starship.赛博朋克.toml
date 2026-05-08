@@ -1,0 +1,65 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# 赛博朋克 / 边缘行者风格 (Cyberpunk 2077 Style)
+# 采用高对比度霓虹配色、倾斜切割色块 (Slanted Blocks) 和双色箭头
+format = """
+[┌─](bold #FCE22A) $os$directory$git_branch$git_status$fill$nodejs$rust$golang$php$cmd_duration$time
+[└─>](bold #FCE22A)$character"""
+
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+#  和  组成了 / TEXT / 这种赛博朋克风倾斜切割块
+format = '[](#00F0FF)[ $symbol ](bg:#00F0FF fg:#020227)[ ](#00F0FF)'
+
+[os.symbols]
+Macos = ""
+Linux = ""
+Windows = ""
+
+[directory]
+format = '[](#FF003C)[  $path ](bg:#FF003C fg:#FCE22A)[ ](#FF003C)'
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+format = '[](#FCE22A)[  $branch ](bg:#FCE22A fg:#020227)[ ](#FCE22A)'
+
+[git_status]
+format = '([](#B026FF)[ $all_status$ahead_behind ](bg:#B026FF fg:#FCE22A)[ ](#B026FF))'
+
+[nodejs]
+format = '[](#00F0FF)[  $version ](bg:#00F0FF fg:#020227)[ ](#00F0FF)'
+
+[rust]
+format = '[](#FF003C)[  $version ](bg:#FF003C fg:#FCE22A)[ ](#FF003C)'
+
+[golang]
+format = '[](#FCE22A)[  $version ](bg:#FCE22A fg:#020227)[ ](#FCE22A)'
+
+[php]
+format = '[](#B026FF)[  $version ](bg:#B026FF fg:#FCE22A)[ ](#B026FF)'
+
+[cmd_duration]
+min_time = 2_000
+format = '[](#FF003C)[  $duration ](bg:#FF003C fg:#FCE22A)[ ](#FF003C)'
+
+[time]
+disabled = false
+time_format = "%T" # 赛博朋克需要精确到秒
+format = '[](#00F0FF)[  $time ](bg:#00F0FF fg:#020227)[](#00F0FF)'
+
+[character]
+# 标志性的双色霓虹箭头
+success_symbol = "[ ❯](bold #FCE22A)[❯](bold #00F0FF)"
+error_symbol = "[ ✗](bold #FF003C)[❯](bold #FCE22A)"
